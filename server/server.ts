@@ -22,8 +22,6 @@ on('onResourceStart', (resName: string) => {
 onNet('template:fetch-player', async (nuiData: NuiData) => {
     const currentID = source || nuiData.source;
 
-    console.log(nuiData);
-
     const response = await fetch(
         `https://my-json-server.typicode.com/maneskul/users-db/users?id=${nuiData.player}`
     );
@@ -34,7 +32,6 @@ onNet('template:fetch-player', async (nuiData: NuiData) => {
 
 onNet('template:update-player', async (nuiData: NuiData) => {
     const currentID = source || nuiData.source;
-    console.log(nuiData);
 
     const response = await fetch(
         `https://my-json-server.typicode.com/maneskul/users-db/users?id=${nuiData.player}`
