@@ -1,6 +1,11 @@
 import { sendNuiMessage } from '../nui';
 import { QBCore } from './Helpers';
 
+interface PlayerData {
+    id: string;
+    name: string;
+}
+
 export default class Template {
     static open() {
         SetNuiFocus(true, true);
@@ -31,7 +36,8 @@ export default class Template {
             if (distance <= 5.0) {
                 players.push({
                     id: GetPlayerServerId(player),
-                    name: GetPlayerName(player)
+                    name: GetPlayerName(player),
+                    distance
                 });
             }
         }
@@ -41,5 +47,9 @@ export default class Template {
 
     static sendNotification(notification: string) {
         sendNuiMessage('notification', notification);
+    }
+
+    static sendPlayerFetch(data: PlayerData[]) {
+        sendNuiMessage('player-fetch', data);
     }
 }

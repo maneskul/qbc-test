@@ -13,6 +13,7 @@ import { Dispatch, isProduction } from '../utils/Helpers';
 interface Players {
     id: number;
     name: string;
+    distance: number;
 }
 
 interface NuiData {
@@ -31,7 +32,7 @@ const MainContext = createContext<MainContextType>(null!);
 
 const defaultValues = {
     name: 'BUR4KBEY',
-    players: [{ id: 1, name: 'Teste' }] as Players[]
+    players: [{ id: 1, name: 'Teste', distance: 3.4 }] as Players[]
 };
 
 export function MainProvider({ children }: { children: ReactNode }) {

@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 interface NuiData<T = unknown> {
     name: string;
-
+    source: number;
     data: T;
 }
 
@@ -30,6 +30,18 @@ export function createNuiCallBacks() {
                 return;
             }
 
+            if (name === 'fetch-player') {
+                const localData = incomingData as NuiData<SendMessageType>;
+                const { data } = localData;
+                emitNet('template:fetch-player', data);
+            }
+
+            if (name === 'update-player') {
+                const localData = incomingData as NuiData<SendMessageType>;
+                const { data } = localData;
+                emitNet('template:update-player', data);
+            }
+
             if (name === 'send-message') {
                 const localData = incomingData as NuiData<SendMessageType>;
                 const { data } = localData;
@@ -42,7 +54,7 @@ export function createNuiCallBacks() {
                             'Message sent to client. Press F8 to check it!'
                     });
                 } else if (data.to === 'server') {
-                    emitNet('template:send-message', data.message);
+                    emitNet('template:send-message', data);
                 }
             }
         }

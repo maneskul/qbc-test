@@ -9,43 +9,44 @@ interface ResponseType {
     notification: 'string';
 }
 
+interface PlayerData {
+    id: string;
+    name: string;
+}
+
 export default function IndexPage() {
     const { name, players } = useMain();
-
+    const savedMessage = '';
     const [message, setMessage] = useState('');
+    const [selectedPlayer, setPlayer] = useState('');
+    const [playerData, setPlayerData] = useState<PlayerData[]>();
     const [notification, setNotification] = useState(
         isProduction ? '' : 'Notification here'
     );
 
-    const sendMessageToClient = async () => {
-        if (isProduction) {
-            const response = await fetchNui<ResponseType>('send-message', {
-                to: 'client',
-                message: message || 'Empty message'
-            });
-            setNotification(response.notification);
-        } else {
-            // eslint-disable-next-line no-console
-            console.log(`send message to client: ${message}`);
-        }
+    const fetchPlayer = async (player: string) => {
+        setPlayer(player);
+        await fetchNui<ResponseType>('fetch-player', {
+            to: 'server',
+            player
+        });
     };
 
-    const sendMessageToServer = async () => {
-        if (isProduction) {
-            const response = await fetchNui<ResponseType>('send-message', {
-                to: 'server',
-                message: message || 'Empty message'
-            });
-            setNotification(response.notification);
-        } else {
-            // eslint-disable-next-line no-console
-            console.log(`send message to server: ${message}`);
-        }
+    const updatePlayer = async () => {
+        await fetchNui<ResponseType>('update-player', {
+            to: 'server',
+            message: message || 'Empty message',
+            player: selectedPlayer
+        });
     };
 
     if (isProduction) {
         useNuiEvent<string>('notification', notificationFromServer => {
             setNotification(notificationFromServer);
+        });
+
+        useNuiEvent<PlayerData[]>('player-fetch', notificationFromServer => {
+            setPlayerData(notificationFromServer);
         });
     }
 
@@ -58,7 +59,6 @@ export default function IndexPage() {
                 Press <span className="font-bold text-orange-600">ESC</span> to
                 exit.
             </p>
-
             <div className="flex w-[32rem] flex-col items-center gap-4">
                 <div className="w-[32rem]">
                     <label
@@ -70,10 +70,13 @@ export default function IndexPage() {
                     <select
                         className="font-poppins focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
                         id="player_id"
+                        onChange={e => fetchPlayer(e.target.value)}
                     >
+                        <option>[Selecione um jogador]</option>
                         {players.map((player, index) => (
-                            <option key={index}>
-                                {player.name} - [{player.id}]
+                            <option key={index} value={player.id}>
+                                {player.name} - [{player.id}] - Distance{' '}
+                                {player.distance}
                             </option>
                         ))}
                     </select>
@@ -95,22 +98,26 @@ export default function IndexPage() {
                         maxLength={100}
                     />
                 </div>
-
+                <p className="font-poppins font-semibold text-blue-400">
+                    {savedMessage}
+                </p>
                 <div className="flex w-full justify-between gap-2">
-                    <button
-                        className="focus:shadow-outline w-full rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700 focus:outline-none"
-                        type="button"
-                        onClick={sendMessageToClient}
-                    >
-                        Send To Client
-                    </button>
                     <button
                         className="focus:shadow-outline w-full rounded bg-green-500 py-2 px-4 font-bold text-white hover:bg-green-700 focus:outline-none"
                         type="button"
-                        onClick={sendMessageToServer}
+                        onClick={updatePlayer}
                     >
-                        Send To Server
+                        Enviar
                     </button>
+                </div>
+
+                <div className="flex w-full justify-between gap-2">
+                    {playerData &&
+                        playerData.map(player => (
+                            <p>
+                                {player.id} | {player.name}
+                            </p>
+                        ))}
                 </div>
 
                 {notification && (

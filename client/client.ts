@@ -15,3 +15,4 @@ createNuiCallBacks();
 RegisterCommand('testar', Template.open, false);
 
 onNet('template:send-notification', Template.sendNotification);
+onNet('template:send-player', Template.sendPlayerFetch);
